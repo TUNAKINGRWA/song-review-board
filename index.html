@@ -97,6 +97,8 @@
   .tradetab th,.tradetab td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
   .tradetab th{color:var(--t3);font-weight:600}
   .assets{font-size:13px;color:var(--t2)}.assets b{font-size:22px;color:var(--t1)}
+  .secret{cursor:pointer;border-bottom:1px dashed var(--line2);user-select:none;transition:.15s}
+  .secret:hover{color:var(--orange)}
 
   /* 脉络视图 */
   .story{display:grid;gap:14px}
@@ -198,7 +200,7 @@ const DAYS = [
         {nm:'中航西飞',px:'17.7',qty:'800股'},
         {nm:'北方股份',px:'22.59',qty:'300股'},
         {nm:'睿能科技',px:'24.28',qty:'200股'}],
-      assets:'å·²éè'
+      assets:'325958.82'
     },
     mistake:{
       res:'✗ 「追在当日最高，判断错误」',
@@ -218,8 +220,12 @@ const DAYS = [
 ];
 
 // 净值
-const NAV = [{d:'6/2',a:'å·²éè',chg:'基准'}];
+const NAV = [{d:'6/2',a:'325958.82',chg:'基准'}];
 
+function toggleSecret(el){
+  if(el.dataset.shown==='1'){el.textContent='＊＊＊＊＊＊';el.dataset.shown='0';}
+  else{el.textContent=el.dataset.val;el.dataset.shown='1';}
+}
 function maxAbs(arr){return Math.max.apply(null,arr.map(x=>Math.abs(x.v)))||1}
 function flowRows(items,color){
   const m=maxAbs(items);
@@ -291,7 +297,7 @@ function renderDay(day){
         <div class="card">
           <table class="tradetab"><tr><th>持仓</th><th>价格</th><th>数量</th></tr>
           ${day.trades.hold.map(h=>`<tr><td>${h.nm}</td><td class="mono">${h.px}</td><td class="mono">${h.qty}</td></tr>`).join('')}</table>
-          <div class="assets" style="margin-top:12px">收盘总资产 <b class="mono">${day.trades.assets}</b> 元</div>
+          <div class="assets" style="margin-top:12px">收盘总资产 <b class="mono secret" data-val="${day.trades.assets}" onclick="toggleSecret(this)">＊＊＊＊＊＊</b> 元 <span style="font-size:11px;color:var(--t3)">（点一下显示/隐藏）</span></div>
         </div>
         <div class="card err">
           <div style="font-size:13px;color:var(--up);font-weight:700;margin-bottom:4px">错题 · 自我复盘</div>
@@ -318,7 +324,7 @@ function renderStory(){
   const nodes = DAYS.map(d=>`
     <div class="snode"><div class="dd">${d.d}</div>
       <div class="card"><div class="tt">${d.q}</div><div class="tx"><b>主线：</b>${d.main}</div></div></div>`).join('');
-  const navrows = NAV.map(n=>`<tr><td>${n.d}</td><td class="mono">${n.a}</td><td>${n.chg}</td></tr>`).join('');
+  const navrows = NAV.map(n=>`<tr><td>${n.d}</td><td><span class="mono secret" data-val="${n.a}" onclick="toggleSecret(this)">＊＊＊＊＊＊</span></td><td>${n.chg}</td></tr>`).join('');
   return `
   <div class="hero"><div><div class="eye">三天脉络</div><h1>高切低 → 一日反转 → 认错切回</h1>
     <div class="meta"><span class="pill">资金一天反转762亿</span><span class="pill">焦煤切换被打脸</span><span class="pill warn">⚠ 单日资金不外推</span></div></div></div>
