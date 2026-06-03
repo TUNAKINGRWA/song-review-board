@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>松松复盘日记 · 归档看板</title>
+<style>
+  :root{
+    --bg:#faf6ef; --bg2:#fffdf9; --card:#ffffff; --card2:#f5efe4;
+    --line:#ece4d6; --line2:#ddd2bf;
+    --orange:#e8631a; --orange-l:#f5862f; --gold:#caa24a; --cream:#7a5424;
+    --up:#dc3a3a; --down:#159b57; --t1:#2c2620; --t2:#6f6354; --t3:#9f9482;
+    --sh:0 2px 14px rgba(120,90,40,.07); --sh2:0 6px 22px rgba(120,90,40,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+    background:radial-gradient(1100px 640px at 82% -8%,rgba(232,99,26,.10),transparent 60%),
+               radial-gradient(820px 560px at -5% 102%,rgba(202,162,74,.12),transparent 55%),var(--bg);
+    color:var(--t1);line-height:1.6;min-height:100vh;padding-bottom:60px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+  .up{color:var(--up)}.down{color:var(--down)}.org{color:var(--orange)}
+  .mono{font-variant-numeric:tabular-nums}
+
+  /* 顶部 */
+  .top{position:sticky;top:0;z-index:50;background:rgba(255,253,249,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .top .wrap{padding-top:14px;padding-bottom:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;margin-bottom:12px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--orange)}
+  .brand .sub{font-size:12px;color:var(--t3);font-weight:500;margin-left:auto}
+  /* 时间线 */
+  .timeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+  .tl{flex:1;min-width:150px;text-align:left;background:var(--card);border:1px solid var(--line);
+    border-radius:13px;padding:11px 14px;cursor:pointer;transition:.2s;box-shadow:var(--sh)}
+  .tl:hover{transform:translateY(-2px)}
+  .tl.active{border-color:var(--orange);box-shadow:0 4px 16px rgba(232,99,26,.18)}
+  .tl .d{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
+  .tl .d .wd{font-size:11px;color:var(--t3);font-weight:500}
+  .tl .q{font-size:11.5px;color:var(--t2);margin-top:4px;line-height:1.4}
+  .tl.active .d{color:var(--orange)}
+  .tl.flow{min-width:96px;flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .tl.flow .ic{font-size:18px}
+
+  /* 视图 */
+  #view{padding-top:26px}
+  .hero{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;align-items:center;margin-bottom:8px}
+  .hero .eye{font-size:12px;letter-spacing:2px;color:var(--orange);font-weight:700}
+  .hero h1{font-size:32px;font-weight:800;line-height:1.2;margin:8px 0 0}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .pill{font-size:12px;padding:4px 11px;border-radius:999px;border:1px solid var(--line2);background:var(--card);color:var(--t2);box-shadow:var(--sh)}
+  .pill.warn{color:var(--up);border-color:rgba(220,58,58,.3);background:rgba(220,58,58,.06)}
+  .gauge{position:relative;width:150px;height:150px;margin:0 auto}
+  .gauge .lab{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .n{font-size:40px;font-weight:800;color:var(--orange);line-height:1}
+  .gauge .c{font-size:11px;color:var(--t2);margin-top:4px}
+
+  section{padding:22px 0;border-top:1px solid var(--line);margin-top:8px}
+  .sh{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .sh .bar{width:5px;height:20px;border-radius:3px;background:var(--orange)}
+  .sh h2{font-size:18px;font-weight:800}
+  .grid{display:grid;gap:14px}
+  .c3{grid-template-columns:repeat(3,1fr)}
+  .c2{grid-template-columns:1fr 1fr}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--sh)}
+  .idx .nm{font-size:13px;color:var(--t2)}
+  .idx .cl{font-size:26px;font-weight:800;margin:4px 0 2px}
+  .idx .cg{font-size:14px;font-weight:700}
+  .idx .ex{font-size:11.5px;color:var(--t3);margin-top:6px}
+  .vs{display:flex;height:36px;border-radius:9px;overflow:hidden;margin-top:6px}
+  .vs .l{background:var(--up);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .vs .r{background:var(--down);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .fl{display:grid;gap:8px}
+  .fl .r{display:grid;grid-template-columns:96px 1fr 58px;align-items:center;gap:9px;font-size:12.5px}
+  .fl .nm{color:var(--t2);text-align:right}
+  .fl .tk{height:20px;background:var(--card2);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  .fl .f{height:100%;border-radius:5px}
+  .fl .v{font-weight:700;font-size:12px}
+  .stk{display:grid;grid-template-columns:74px 1fr 46px;align-items:center;gap:8px;margin-bottom:6px;font-size:12.5px}
+  .stk .tk{height:15px;background:var(--card2);border-radius:4px;overflow:hidden}
+  .stk .f{height:100%}
+  .stk .pt{text-align:right;font-weight:700;font-size:11.5px}
+  .plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .pk{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;box-shadow:var(--sh);position:relative;overflow:hidden}
+  .pk::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)}
+  .pk .nm{font-size:15px;font-weight:800}
+  .pk .ps{font-size:20px;font-weight:800;color:var(--orange);margin:6px 0 2px}
+  .pk .nt{font-size:11.5px;color:var(--t2)}
+  .read{display:grid;gap:9px}
+  .read .i{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:13px;color:var(--t2);box-shadow:var(--sh)}
+  .read .i b{color:var(--cream)}
+  .chip{display:inline-block;font-size:11.5px;padding:4px 10px;border-radius:7px;background:var(--card2);border:1px solid var(--line);color:var(--t2);margin:3px 4px 0 0}
+  .chip.hot{color:var(--orange);border-color:rgba(232,99,26,.3)}
+  .err{background:rgba(220,58,58,.05);border:1px solid rgba(220,58,58,.25)}
+  .err h2{color:var(--up)}
+  .err .res{font-size:14px;font-weight:700;color:var(--up);margin:8px 0}
+  .tradetab{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  .tradetab th,.tradetab td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+  .tradetab th{color:var(--t3);font-weight:600}
+  .assets{font-size:13px;color:var(--t2)}.assets b{font-size:22px;color:var(--t1)}
+
+  /* 脉络视图 */
+  .story{display:grid;gap:14px}
+  .snode{display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:start}
+  .snode .dd{font-size:16px;font-weight:800;color:var(--orange);text-align:center;padding-top:14px;position:relative}
+  .snode .dd::after{content:"";position:absolute;left:50%;top:42px;bottom:-14px;width:2px;background:var(--line2);transform:translateX(-50%)}
+  .snode:last-child .dd::after{display:none}
+  .snode .card{flex:1}
+  .snode .tt{font-size:15px;font-weight:800;margin-bottom:6px}
+  .snode .tx{font-size:13px;color:var(--t2)}
+  .navib{font-size:11px;color:var(--t3);margin-top:14px;text-align:center}
+
+  @media(max-width:820px){.hero{grid-template-columns:1fr}.c3,.c2,.plan{grid-template-columns:1fr}.hero h1{font-size:26px}}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <div class="brand"><span class="dot"></span>松松复盘日记 · 归档看板<span class="sub">点日期切换 · 私人知识库</span></div>
+  <div class="timeline" id="timeline"></div>
+</div></div>
+
+<div class="wrap"><div id="view"></div></div>
+
+<script>
+const DAYS = [
+  {
+    id:'2026-06-01', d:'6/1', wd:'周一 · 数据=5.29收盘+6.1计划',
+    q:'高开杀跌·放量破位·高低切换',
+    eye:'复盘 5.29收盘 → 计划 6.1',
+    tags:[{t:'网下破位·横盘11日',w:1},{t:'成交3.32万亿 ↑11.82%'},{t:'证金护盘 +130亿'},{t:'芯片出逃 −808亿'}],
+    idx:[
+      {nm:'上证指数',cl:'4068.57',cg:'−0.73%',dir:'down',ex:'高开低走'},
+      {nm:'创业板指',cl:'4037.95',cg:'−2.11%',dir:'down',ex:'冲高回落'},
+      {nm:'科创50',cl:'1751.32',cg:'−5.34%',dir:'down',ex:'大幅跳水'}],
+    fear:29, fearc:'偏恐慌',
+    up:49, down:50, mood:'跌停>涨停，杀跌占优。4板断层、连板高度被压。',
+    flowIn:[{nm:'跨境支付',v:36.9},{nm:'银行',v:26.7},{nm:'超级品牌',v:24.9}],
+    flowOut:[{nm:'芯片',v:808},{nm:'华为概念',v:55.7}],
+    cUp:[{nm:'贵州茅台',v:3.93},{nm:'工商银行',v:3.05},{nm:'农业银行',v:2.21},{nm:'招商银行',v:1.55}],
+    cDown:[{nm:'寒武纪',v:3.22},{nm:'海光信息',v:2.99},{nm:'工业富联',v:2.0},{nm:'中际旭创',v:1.73}],
+    plan:[
+      {nm:'中航西飞',ps:'30%',nt:'核心底仓 +20%右侧补'},
+      {nm:'国睿科技',ps:'10%',nt:'军工电子底仓'},
+      {nm:'万达信息',ps:'10%',nt:'医保信息化底仓'},
+      {nm:'睿能科技',ps:'10%',nt:'长线2年+'},
+      {nm:'大军工',ps:'→30%',nt:'破BOLL中轨左侧加'},
+      {nm:'大龙地产',ps:'博弈',nt:'没冲就走'}],
+    read:[
+      '<b>结构性洗盘非反转：</b>上证仅−0.73%、证金+130亿护盘，破位是调结构。但放量破位当天别满仓抄，等缩量企稳。',
+      '<b>军工内部普跌：</b>菲利华−7.31/中国卫星−6.15，还没合力，左侧加仓控制单方向总仓位。',
+      '<b>漏了最强主线：</b>跨境支付+36.9亿净流入最强，计划没配，可分点博弈仓。'],
+    main:'资金高低切换：科技 → 价值/主题'
+  },
+  {
+    id:'2026-06-02', d:'6/2', wd:'周二 · 复盘6.1收盘+6.2计划',
+    q:'缩量高低切·指数失真（AI高切低）',
+    eye:'复盘 6.1收盘 → 计划 6.2',
+    tags:[{t:'缩量 −13.3%(−4415亿)',w:1},{t:'成交2.88万亿'},{t:'涨停118/跌停21'},{t:'上涨3513家'}],
+    idx:[
+      {nm:'上证指数',cl:'4057.74',cg:'−0.77%',dir:'down',ex:'缩量阴跌'},
+      {nm:'创业板指',cl:'3958.94',cg:'−2.15%',dir:'down',ex:'破3960'},
+      {nm:'科创50',cl:'1690',cg:'−5%',dir:'down',ex:'连续大跌'}],
+    fear:23, fearc:'更恐慌',
+    up:118, down:21, mood:'指数跌但涨停118、上涨3513——个股普涨。恐慌指数被权重低估了真实赚钱效应。',
+    flowIn:[{nm:'AI应用',v:103.6},{nm:'AI智能体',v:86.4},{nm:'数字人',v:79.4},{nm:'AIGC',v:77.9},{nm:'ChatGPT概念',v:72.1}],
+    flowOut:[{nm:'芯片',v:279.1},{nm:'数据中心',v:146.4},{nm:'CPO/封装',v:131.3},{nm:'存储',v:114.9}],
+    cUp:[{nm:'农业银行',v:3.41},{nm:'中国神华',v:1.5},{nm:'工商银行',v:1.36},{nm:'兖矿能源',v:0.82}],
+    cDown:[{nm:'寒武纪',v:2.84},{nm:'海光信息',v:2.71},{nm:'中际旭创',v:1.45}],
+    plan:[
+      {nm:'博弈',ps:'观察',nt:'先看第一梯队龙头'},
+      {nm:'万达信息',ps:'+1仓',nt:'周三加仓·AI应用+数据要素'},
+      {nm:'西飞',ps:'持有',nt:'军工延续'},
+      {nm:'AI应用小软件',ps:'博弈',nt:'不补就抛'}],
+    read:[
+      '<b>别被指数骗：</b>涨停118、上涨3513，权重失真的结构市，个股赚钱效应在修复。用个股情绪不是指数情绪。',
+      '<b>AI应用是接力非反转：</b>硬件兑现→应用承接想象。但多是小盘软件股、易一日游，适合博弈仓别当底仓。',
+      '<b>高股息是锚：</b>银行+煤炭持续护盘，防御资金没走，科技杀跌难变系统性下跌。'],
+    main:'AI高切低：硬件(算力) → 应用(软件)'
+  },
+  {
+    id:'2026-06-03', d:'6/3', wd:'周三 · 复盘6.2收盘+6.3计划 ⭐含实盘',
+    q:'高切低「一日反转」打脸日',
+    eye:'复盘 6.2收盘 → 计划 6.3',
+    tags:[{t:'指数涨·个股普跌',w:1},{t:'芯片回流 +483亿'},{t:'涨停64/跌停7'},{t:'上涨1372<下跌3739'}],
+    idx:[
+      {nm:'上证指数',cl:'4075.1',cg:'+0.43%',dir:'up',ex:'权重拉指数'},
+      {nm:'创业板指',cl:'4055',cg:'+2.66%',dir:'up',ex:'科技反包'},
+      {nm:'科创50',cl:'1690',cg:'+1.62%',dir:'up',ex:'修复'}],
+    fear:null,
+    up:64, down:7, mood:'指数涨、个股普跌(涨1372<跌3739)。与6.1正好相反——权重/科技拉指数，小票被抽血。',
+    flowIn:[{nm:'芯片',v:483.1},{nm:'CPO光电',v:120},{nm:'新能源车',v:110}],
+    flowOut:[{nm:'AI应用',v:91.0},{nm:'天然气',v:32.0},{nm:'互联网金融',v:30.8}],
+    cUp:[{nm:'工业富联',v:7.81},{nm:'寒武纪',v:2.45},{nm:'紫光国微',v:1.8},{nm:'海光信息',v:1.1}],
+    cDown:[{nm:'中国石油',v:1.63},{nm:'中国神华',v:0.37},{nm:'农业银行',v:0.46},{nm:'中国人寿',v:0.44}],
+    cUpLabel:'护盘——这次全是科技', cDownLabel:'拖累——昨天护盘的高股息',
+    trades:{
+      hold:[
+        {nm:'中航西飞',px:'17.7',qty:'800股'},
+        {nm:'北方股份',px:'22.59',qty:'300股'},
+        {nm:'睿能科技',px:'24.28',qty:'200股'}],
+      assets:'å·²éè'
+    },
+    mistake:{
+      res:'✗ 「追在当日最高，判断错误」',
+      txt:'6.2开盘量比高，判断大盘要调整、资金切焦煤(高股息)，买入山西焦煤17.8。结果6.2科技暴力反包、芯片+483，焦煤没动。逻辑对一半、择时错。'
+    },
+    plan:[
+      {nm:'山西焦煤',ps:'卖出',nt:'认错切出'},
+      {nm:'锐捷网络',ps:'买入',nt:'切回算力'},
+      {nm:'中科曙光',ps:'买入',nt:'跟6.2回流资金'},
+      {nm:'贵航股份',ps:'观察',nt:'视情加仓西飞'}],
+    read:[
+      '<b>单日资金流不外推：</b>6.1芯片−279→6.2+483，一天反转762亿。看连续2–3日方向，别用一天定调。',
+      '<b>不追当日最高：</b>开盘量比高≠该追，往往诱多。改回踩不破再上车/分批。',
+      '<b>当日认错执行合格：</b>6.3卖焦煤切回算力，不死扛。复盘到实盘颗粒度，已超99%散户。'],
+    main:'一日反转：科技反包，焦煤打脸'
+  }
+];
+
+// 净值
+const NAV = [{d:'6/2',a:'å·²éè',chg:'基准'}];
+
+function maxAbs(arr){return Math.max.apply(null,arr.map(x=>Math.abs(x.v)))||1}
+function flowRows(items,color){
+  const m=maxAbs(items);
+  return items.map(x=>`<div class="r"><span class="nm">${x.nm}</span><div class="tk"><div class="f" style="width:${Math.abs(x.v)/m*100}%;background:${color}"></div></div><span class="v" style="color:${color}">${x.v>0?'+':'−'}${Math.abs(x.v)}</span></div>`).join('');
+}
+function stkRows(items,color,sign){
+  const m=maxAbs(items);
+  return items.map(x=>`<div class="stk"><span>${x.nm}</span><div class="tk"><div class="f" style="width:${Math.abs(x.v)/m*100}%;background:${color}"></div></div><span class="pt" style="color:${color}">${sign}${x.v}</span></div>`).join('');
+}
+
+function renderDay(day){
+  const fearHtml = day.fear!=null ? `
+    <div><div class="gauge"><svg viewBox="0 0 120 120" width="150" height="150">
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#efe4d2" stroke-width="11"/>
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#e8631a" stroke-width="11" stroke-linecap="round"
+        stroke-dasharray="${314*day.fear/100} 314" transform="rotate(-90 60 60)"/></svg>
+      <div class="lab"><div class="n">${day.fear}</div><div class="c">恐慌 · ${day.fearc}</div></div></div></div>` :
+    `<div style="text-align:center"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">当日未记恐慌指数</div>
+      <div style="font-size:13px;color:var(--t2)">情绪看个股：<br>涨停 <b class="up">${day.up}</b> / 跌停 <b class="down">${day.down}</b></div></div>`;
+
+  const cUpLabel = day.cUpLabel||'护盘（正贡献点数）';
+  const cDownLabel = day.cDownLabel||'砸盘（拖累点数）';
+
+  let html = `
+  <div class="hero">
+    <div>
+      <div class="eye">${day.eye}</div>
+      <h1>${day.q}</h1>
+      <div class="meta">${day.tags.map(t=>`<span class="pill ${t.w?'warn':''}">${t.w?'⚠ ':''}${t.t}</span>`).join('')}</div>
+    </div>
+    ${fearHtml}
+  </div>
+
+  <section><div class="sh"><span class="bar"></span><h2>大盘快照</h2></div>
+    <div class="grid c3">${day.idx.map(i=>`<div class="card idx">
+      <div class="nm">${i.nm}</div>
+      <div class="cl ${i.dir}">${i.cl}</div>
+      <div class="cg ${i.dir}">${i.cg}</div>
+      <div class="ex">${i.ex}</div></div>`).join('')}</div>
+  </section>
+
+  <section><div class="sh"><span class="bar"></span><h2>市场情绪</h2></div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--t2);margin-bottom:6px">涨停 vs 跌停</div>
+      <div class="vs"><div class="l" style="flex:${day.up}">涨停 ${day.up}</div><div class="r" style="flex:${day.down}">跌停 ${day.down}</div></div>
+      <div style="font-size:12.5px;color:var(--t2);margin-top:10px">${day.mood}</div>
+    </div>
+  </section>
+
+  <section><div class="sh"><span class="bar"></span><h2>资金流向 · 主线「${day.main}」</h2></div>
+    <div class="grid c2">
+      <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">净流入（绿）</div><div class="fl">${flowRows(day.flowIn,'#159b57')}</div></div>
+      <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">净流出（橙红）</div><div class="fl">${flowRows(day.flowOut.map(x=>({nm:x.nm,v:-x.v})),'#dc3a3a')}</div></div>
+    </div>
+  </section>
+
+  <section><div class="sh"><span class="bar"></span><h2>指数贡献拆解</h2></div>
+    <div class="grid c2">
+      <div class="card"><div style="font-size:13px;color:var(--t1);margin-bottom:10px"><span class="up">▲</span> ${cUpLabel}</div>${stkRows(day.cUp,'#dc3a3a','+')}</div>
+      <div class="card"><div style="font-size:13px;color:var(--t1);margin-bottom:10px"><span class="down">▼</span> ${cDownLabel}</div>${stkRows(day.cDown,'#159b57','−')}</div>
+    </div>
+  </section>`;
+
+  // 实盘 + 错题（仅6.3）
+  if(day.trades){
+    html += `
+    <section><div class="sh"><span class="bar"></span><h2>⭐ 实盘记录</h2></div>
+      <div class="grid c2">
+        <div class="card">
+          <table class="tradetab"><tr><th>持仓</th><th>价格</th><th>数量</th></tr>
+          ${day.trades.hold.map(h=>`<tr><td>${h.nm}</td><td class="mono">${h.px}</td><td class="mono">${h.qty}</td></tr>`).join('')}</table>
+          <div class="assets" style="margin-top:12px">收盘总资产 <b class="mono">${day.trades.assets}</b> 元</div>
+        </div>
+        <div class="card err">
+          <div style="font-size:13px;color:var(--up);font-weight:700;margin-bottom:4px">错题 · 自我复盘</div>
+          <div class="res">${day.mistake.res}</div>
+          <div style="font-size:12.5px;color:var(--t2)">${day.mistake.txt}</div>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  html += `
+  <section><div class="sh"><span class="bar"></span><h2>操盘计划 · 推荐票</h2></div>
+    <div class="plan">${day.plan.map(p=>`<div class="pk"><div class="nm">${p.nm}</div><div class="ps">${p.ps}</div><div class="nt">${p.nt}</div></div>`).join('')}</div>
+  </section>
+
+  <section><div class="sh"><span class="bar"></span><h2>我的解读</h2></div>
+    <div class="read">${day.read.map(r=>`<div class="i">${r}</div>`).join('')}</div>
+  </section>`;
+
+  return html;
+}
+
+function renderStory(){
+  const nodes = DAYS.map(d=>`
+    <div class="snode"><div class="dd">${d.d}</div>
+      <div class="card"><div class="tt">${d.q}</div><div class="tx"><b>主线：</b>${d.main}</div></div></div>`).join('');
+  const navrows = NAV.map(n=>`<tr><td>${n.d}</td><td class="mono">${n.a}</td><td>${n.chg}</td></tr>`).join('');
+  return `
+  <div class="hero"><div><div class="eye">三天脉络</div><h1>高切低 → 一日反转 → 认错切回</h1>
+    <div class="meta"><span class="pill">资金一天反转762亿</span><span class="pill">焦煤切换被打脸</span><span class="pill warn">⚠ 单日资金不外推</span></div></div></div>
+  <section><div class="sh"><span class="bar"></span><h2>主线演进</h2></div><div class="story">${nodes}</div>
+    <div class="navib">每天的资金主线在变，方向反复——这就是为什么「单日不外推、当日认错」是铁律。</div>
+  </section>
+  <section><div class="sh"><span class="bar"></span><h2>实盘净值</h2></div>
+    <div class="card"><table class="tradetab"><tr><th>日期</th><th>收盘总资产</th><th>变动</th></tr>${navrows}</table>
+    <div style="font-size:12px;color:var(--t3);margin-top:10px">每天补一行收盘总资产，就能画真实净值曲线、算每笔胜率。</div></div>
+  </section>`;
+}
+
+function build(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = DAYS.map((d,i)=>`<div class="tl" data-i="${i}"><div class="d">${d.d}<span class="wd">${d.wd.split('·')[0]}</span></div><div class="q">${d.q}</div></div>`).join('')
+    + `<div class="tl flow" data-i="story"><div class="ic">📈</div><div style="font-size:12px;font-weight:700;margin-top:3px">脉络/净值</div></div>`;
+  tl.querySelectorAll('.tl').forEach(el=>el.addEventListener('click',()=>select(el.dataset.i)));
+  select(String(DAYS.length-1)); // 默认打开最新一天
+}
+function select(i){
+  document.querySelectorAll('.tl').forEach(el=>el.classList.toggle('active',el.dataset.i===i));
+  const view = document.getElementById('view');
+  view.innerHTML = (i==='story') ? renderStory() : renderDay(DAYS[+i]);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+build();
+</script>
+</body>
+</html>
