@@ -43,6 +43,17 @@
   .sres .it .tx mark{background:rgba(232,99,26,.18);color:var(--cream);border-radius:3px;padding:0 2px}
   .sres .none{padding:14px;font-size:12.5px;color:var(--t3);text-align:center}
 
+  .ticker{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:11px}
+  .ticker .lq{display:flex;align-items:baseline;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px;box-shadow:var(--sh)}
+  .ticker .lq .nm{font-size:11.5px;color:var(--t2)}
+  .ticker .lq .px{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ticker .lq .pc{font-size:12px;font-weight:700}
+  .ticker .meta{margin-left:auto;font-size:11px;color:var(--t3);display:flex;align-items:center;gap:9px}
+  .ticker .live{display:inline-flex;align-items:center;gap:5px;color:var(--down);font-weight:600}
+  .ticker .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--down);animation:livep 1.6s infinite}
+  @keyframes livep{0%,100%{opacity:1}50%{opacity:.25}}
+  .ticker .rf{cursor:pointer;border:1px solid var(--line2);background:var(--card2);border-radius:7px;padding:3px 9px;font-size:11px;color:var(--t2)}
+  .ticker .rf:hover{color:var(--orange);border-color:rgba(232,99,26,.4)}
   .timeline{display:flex;gap:9px;overflow-x:auto;padding-bottom:4px}
   .tl{flex:1;min-width:165px;text-align:left;background:var(--card);border:1px solid var(--line);
     border-radius:13px;padding:10px 13px;cursor:pointer;transition:.2s;box-shadow:var(--sh)}
@@ -204,6 +215,7 @@
   <div class="brand"><span class="dot"></span>松松复盘日记<span class="sub">私人知识库 · 点日期切换</span>
     <div class="searchbox"><input id="q" type="search" placeholder="搜个股 / 板块，如：寒武纪" autocomplete="off"><div class="sres" id="sres"></div></div>
   </div>
+  <div class="ticker" id="ticker"><span style="font-size:12px;color:var(--t3)">实时行情加载中…</span></div>
   <div class="timeline" id="timeline"></div>
 </div></div>
 
@@ -677,6 +689,34 @@ document.addEventListener('click',e=>{if(!e.target.closest('.searchbox'))documen
 const bt=document.getElementById('backtop');
 window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>500));
 bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* ============ 实时大盘行情（腾讯接口·script注入绕过跨域） ============ */
+const IDX_LIVE=[{code:'sh000001',nm:'上证'},{code:'sz399001',nm:'深成'},{code:'sz399006',nm:'创业板'},{code:'sh000688',nm:'科创50'}];
+function liveTime(ds){if(!ds||ds.length<12)return'';return ds.slice(4,6)+'/'+ds.slice(6,8)+' '+ds.slice(8,10)+':'+ds.slice(10,12);}
+function renderLive(){
+  const box=document.getElementById('ticker');if(!box)return;
+  let ok=false,cards='',ts='';
+  IDX_LIVE.forEach(x=>{
+    const raw=window['v_'+x.code];if(!raw)return;ok=true;
+    const a=raw.split('~');const px=parseFloat(a[3]),prev=parseFloat(a[4]);
+    if(!px){return;}
+    const pct=prev?(px-prev)/prev*100:0;const up=pct>=0,col=up?'#dc3a3a':'#159b57';
+    if(!ts)ts=liveTime(a[30]);
+    cards+=`<div class="lq"><span class="nm">${x.nm}</span><span class="px" style="color:${col}">${px.toFixed(2)}</span><span class="pc" style="color:${col}">${up?'+':''}${pct.toFixed(2)}%</span></div>`;
+  });
+  if(!ok){box.innerHTML='<span style="font-size:12px;color:var(--up)">⚠ 实时行情暂时取不到</span> <span class="rf" onclick="loadLive()">↻ 重试</span>';return;}
+  box.innerHTML=cards+`<div class="meta"><span class="live">实时</span><span>${ts||'数据时间未知'}</span><span class="rf" onclick="loadLive()">↻ 刷新</span></div>`;
+}
+function loadLive(){
+  const box=document.getElementById('ticker');if(!box)return;
+  const s=document.createElement('script');s.charset='gbk';
+  s.src='https://qt.gtimg.cn/q='+IDX_LIVE.map(x=>x.code).join(',')+'&r='+Date.now();
+  s.onload=()=>{renderLive();s.remove();};
+  s.onerror=()=>{box.innerHTML='<span style="font-size:12px;color:var(--up)">⚠ 实时行情加载失败（可能网络限制）</span> <span class="rf" onclick="loadLive()">↻ 重试</span>';s.remove();};
+  document.body.appendChild(s);
+}
+loadLive();
+setInterval(loadLive,60000);  // 盘中每60秒自动刷新
 
 build();
 </script>
