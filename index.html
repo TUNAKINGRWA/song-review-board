@@ -202,49 +202,39 @@
   .kbd-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:26px}
   .kbd-hint kbd{background:var(--card2);border:1px solid var(--line2);border-radius:5px;padding:1px 6px;font-size:10.5px}
 
-  /* ===== 涨停板复盘（板块龙虎+游资）===== */
-  .board-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-  .board-tbl th{background:linear-gradient(135deg,#e8631a,#c84e0f);color:#fff;font-size:12px;font-weight:700;
-    padding:9px 10px;text-align:left;white-space:nowrap}
-  .board-tbl th:first-child{border-radius:9px 0 0 0}.board-tbl th:last-child{border-radius:0 9px 0 0}
-  .board-tbl td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  /* ===== 涨停板复盘（还原原图：紧凑标准表格，不是卡片堆叠）===== */
+  .board-wrap{overflow-x:auto}
+  .board-tbl{width:100%;min-width:600px;border-collapse:collapse;font-size:12.5px}
+  .board-tbl caption{caption-side:top;text-align:left;background:linear-gradient(135deg,#e8631a,#c84e0f);color:#fff;
+    font-weight:800;font-size:13.5px;padding:10px 14px;border-radius:10px 10px 0 0}
+  .board-tbl th{background:#fbe9db;color:var(--cream);font-size:11.5px;font-weight:700;
+    padding:7px 10px;text-align:left;white-space:nowrap;border-bottom:2px solid var(--orange)}
+  .board-tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle;line-height:1.5}
   .board-tbl tr:nth-child(even) td{background:var(--card2)}
   .board-tbl .sctnm{font-weight:800;color:var(--t1);white-space:nowrap}
-  .board-tbl .zt{font-weight:800;color:var(--orange);text-align:center;font-size:15px}
-  .coblock{min-width:96px}
-  .conm{font-size:12.5px;font-weight:700;color:var(--t1);display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
-  .conm small{font-size:10.5px;color:var(--orange);font-weight:600}
-  .cotag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:999px;background:rgba(232,99,26,.10);
-    color:var(--orange);border:1px solid rgba(232,99,26,.28);font-weight:600;white-space:nowrap}
-  .cotag.lowconf{background:rgba(159,148,130,.14);color:var(--t3);border-color:var(--line2)}
-  .coticker{display:block;font-size:10px;color:var(--t3);margin-top:2px}
-  .codesc{font-size:11px;color:var(--t2);margin-top:3px;line-height:1.4;max-width:170px}
-  .codesc.warn{color:var(--up)}
+  .board-tbl .zt{font-weight:800;color:var(--orange);text-align:center;font-size:14px}
+  .board-tbl .cat{font-weight:700;color:var(--cream);white-space:nowrap;background:var(--card2)}
+  .board-tbl .num{text-align:right;font-weight:800;white-space:nowrap}
+  .board-tbl .num.up{color:var(--up)}.board-tbl .num.down{color:var(--down)}
+  .board-tbl .seat{color:var(--t2);font-size:11.5px}
 
-  .sent-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}
-  .sent-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-  .sent-tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
-  .sent-tbl td:first-child{width:88px;font-weight:800;color:var(--cream);background:var(--card2);border-radius:8px 0 0 8px}
-  .sent-tbl .names{display:flex;flex-wrap:wrap;gap:6px}
-  .stat-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-  .stat-tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
-  .stat-tbl td:first-child{color:var(--t2)}
-  .stat-tbl td:last-child{text-align:right;font-weight:800;color:var(--orange)}
-
-  .hm-group{margin-bottom:11px}
-  .hm-group .gh{font-size:12px;font-weight:800;color:var(--cream);margin-bottom:6px;display:flex;align-items:center;gap:7px}
-  .hm-group .gh .seat{font-size:10.5px;color:var(--t3);font-weight:500}
-  .hm-row{display:grid;grid-template-columns:1fr 1.3fr 90px;gap:8px;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px dashed var(--line)}
-  .hm-row .st{font-weight:700;color:var(--t1)}
-  .hm-row .seat2{color:var(--t3);font-size:11px}
-  .hm-row .amt{text-align:right;font-weight:800}
+  /* 公司名：紧凑单行 + 小标签，点标签才展开一句话介绍，不撑高表格 */
+  .co{white-space:nowrap;display:inline-block}
+  .con{font-weight:700;color:var(--t1)}
+  .con small{font-weight:500;color:var(--orange);font-size:10.5px;margin-left:2px}
+  .cot{display:inline-block;font-size:9.5px;padding:1px 6px;margin-left:4px;border-radius:999px;cursor:pointer;
+    background:rgba(232,99,26,.10);color:var(--orange);border:1px solid rgba(232,99,26,.28);font-weight:600;white-space:nowrap;user-select:none}
+  .cot.lowconf{background:rgba(159,148,130,.14);color:var(--t3);border-color:var(--line2)}
+  .cot:hover{background:rgba(232,99,26,.2)}
+  .cod{display:none;font-size:11px;color:var(--t2);margin-top:4px;line-height:1.4;white-space:normal;max-width:220px}
+  .cod.show{display:block}
+  .cod .tk{color:var(--t3);font-size:10px}
+  .cod .wn{color:var(--up);display:block;margin-top:2px}
 
   @media(max-width:820px){
     .hero{grid-template-columns:1fr}.c3,.c2,.c4,.thms,.plan{grid-template-columns:1fr}.hero h1{font-size:24px}
     .searchbox{width:100%;margin-left:0}.searchbox input{width:100%}.searchbox input:focus{width:100%}
     .sres{width:100%}
-    .board-tbl{display:block;overflow-x:auto}.sent-grid{grid-template-columns:1fr}
-    .hm-row{grid-template-columns:1fr;gap:2px}
   }
 </style>
 </head>
@@ -497,27 +487,43 @@ const DAYS = [
       ]
     },
     hotMoney:[
-      {group:'顶级游资 · 章盟主',stock:'水晶光电',seat:'中信证券杭州延安路',amt:-15154,label:'−15154万'},
-      {group:'一线游资 · 深南东路',stock:'华工科技',seat:'国联民生证券慈溪影清路',amt:23037,label:'+23037万'},
-      {group:'一线游资 · 深南东路',stock:'和远气体',seat:'广发证券深圳深南东路',amt:-9064,label:'−9064万'},
-      {group:'一线游资 · 深南东路',stock:'长盈通',seat:'国联民生证券宁波财神殿南路',amt:-6976,label:'−6976万'},
-      {group:'一线游资 · 深南东路',stock:'国风新材',seat:'国联民生证券宁波财神殿南路（三日）',amt:-4507,label:'−4507万（三日）'},
-      {group:'一线游资 · 深南东路',stock:'长盈通',seat:'国联民生证券宁波财神殿南路（三日）',amt:-9926,label:'−9926万（三日）'},
-      {group:'一线游资 · 中山东路',stock:'深科技',seat:'国泰海通证券上海松江区中山东路',amt:19276,label:'+19276万'},
-      {group:'一线游资 · 中山东路',stock:'合肥城建',seat:'国泰海通证券上海松江区中山东路',amt:5149,label:'+5149万'},
-      {group:'一线游资 · 中山东路',stock:'洁美科技',seat:'国泰海通证券上海松江区中山东路',amt:18253,label:'+18253万'},
-      {group:'一线游资 · 中山东路',stock:'红板科技',seat:'国泰海通证券上海松江区中山东路',amt:10071,label:'+10071万'},
-      {group:'一线游资 · 中山东路',stock:'洁美科技',seat:'国泰海通证券上海松江区中山东路（三日）',amt:18254,label:'+18254万（三日）'},
-      {group:'一线游资 · 中山东路',stock:'大胜达',seat:'国泰海通证券上海松江区中山东路（三日）',amt:7103,label:'+7103万（三日）'},
-      {group:'一线游资 · 上塘路',stock:'超声电子',seat:'联储证券杭州环城北路',amt:-9725,label:'−9725万'},
-      {group:'一线游资 · 佛山系',stock:'天娱数科',seat:'国泰海通证券三亚迎宾路',amt:-13374,label:'−13374万'},
-      {group:'一线游资 · 成都系',stock:'广生堂',seat:'国泰海通证券成都北一环路',amt:-1889,label:'−1889万'},
-      {group:'知名游资 · 低位挖掘',stock:'太极集团',seat:'华鑫证券佛山南海海五路',amt:598,label:'+598万'},
-      {group:'知名游资 · 低位挖掘',stock:'*ST实达',seat:'东莞证券四川分公司（三日）',amt:311,label:'+311万（三日）'},
-      {group:'机构资金（专用席位，净买卖额）',stock:'博迁新材',seat:'（三日）',amt:97900,label:'净买入9.79亿'},
-      {group:'机构资金（专用席位，净买卖额）',stock:'天娱数科',seat:'',amt:28100,label:'净买入2.81亿'},
-      {group:'机构资金（专用席位，净买卖额）',stock:'美埃科技',seat:'（三日）',amt:-62600,label:'净卖出6.26亿'},
-      {group:'机构资金（专用席位，净买卖额）',stock:'深科技',seat:'',amt:-40600,label:'净卖出4.06亿'},
+      {type:'顶级游资',name:'章盟主',rows:[
+        {stock:'水晶光电',seat:'中信证券杭州延安路',amt:-15154,label:'−15154万'},
+      ]},
+      {type:'一线游资',name:'深南东路',rows:[
+        {stock:'华工科技',seat:'国联民生证券慈溪影清路',amt:23037,label:'+23037万'},
+        {stock:'和远气体',seat:'广发证券深圳深南东路',amt:-9064,label:'−9064万'},
+        {stock:'长盈通',seat:'国联民生证券宁波财神殿南路',amt:-6976,label:'−6976万'},
+        {stock:'国风新材',seat:'国联民生证券宁波财神殿南路（三日）',amt:-4507,label:'−4507万（三日）'},
+        {stock:'长盈通',seat:'国联民生证券宁波财神殿南路（三日）',amt:-9926,label:'−9926万（三日）'},
+      ]},
+      {type:'一线游资',name:'中山东路',rows:[
+        {stock:'深科技',seat:'国泰海通证券上海松江区中山东路',amt:19276,label:'+19276万'},
+        {stock:'合肥城建',seat:'国泰海通证券上海松江区中山东路',amt:5149,label:'+5149万'},
+        {stock:'洁美科技',seat:'国泰海通证券上海松江区中山东路',amt:18253,label:'+18253万'},
+        {stock:'红板科技',seat:'国泰海通证券上海松江区中山东路',amt:10071,label:'+10071万'},
+        {stock:'洁美科技',seat:'国泰海通证券上海松江区中山东路（三日）',amt:18254,label:'+18254万（三日）'},
+        {stock:'大胜达',seat:'国泰海通证券上海松江区中山东路（三日）',amt:7103,label:'+7103万（三日）'},
+      ]},
+      {type:'一线游资',name:'上塘路',rows:[
+        {stock:'超声电子',seat:'联储证券杭州环城北路',amt:-9725,label:'−9725万'},
+      ]},
+      {type:'一线游资',name:'佛山系',rows:[
+        {stock:'天娱数科',seat:'国泰海通证券三亚迎宾路',amt:-13374,label:'−13374万'},
+      ]},
+      {type:'一线游资',name:'成都系',rows:[
+        {stock:'广生堂',seat:'国泰海通证券成都北一环路',amt:-1889,label:'−1889万'},
+      ]},
+      {type:'知名游资',name:'低位挖掘',rows:[
+        {stock:'太极集团',seat:'华鑫证券佛山南海海五路',amt:598,label:'+598万'},
+        {stock:'*ST实达',seat:'东莞证券四川分公司（三日）',amt:311,label:'+311万（三日）'},
+      ]},
+      {type:'机构资金',name:'专用席位净买卖额',rows:[
+        {stock:'博迁新材',seat:'（三日）',amt:97900,label:'净买入9.79亿'},
+        {stock:'天娱数科',seat:'',amt:28100,label:'净买入2.81亿'},
+        {stock:'美埃科技',seat:'（三日）',amt:-62600,label:'净卖出6.26亿'},
+        {stock:'深科技',seat:'',amt:-40600,label:'净卖出4.06亿'},
+      ]},
     ]
   },
   mood:{up:null,down:null,fear:null,
@@ -619,34 +625,78 @@ const TAGS = {
   '博迁新材':{ticker:'605376.SH',tag:'电子粉体材料',desc:'产MLCC用纳米镍粉等金属粉体，全球镍粉市占率第二的核心供应商',conf:'high'},
   '美埃科技':{ticker:'688376.SH',tag:'洁净室装备',desc:'生产风机过滤单元(FFU)及空气过滤器，为半导体/生物制药洁净室供货',conf:'high', note:'笔记中"美埕科技"疑为笔误，A股无此公司，应为"美埃科技"'},
 };
-function coName(name, extra){
+function toggleTag(el){ el.nextElementSibling.classList.toggle('show'); }
+function coCell(name, extra){
   if(!name)return'';
   const t = TAGS[name];
-  const tagChip = t && t.tag ? `<span class="cotag ${t.conf==='low'?'lowconf':''}">${t.tag}</span>` : '';
-  const tickerTxt = t && t.ticker ? `<span class="coticker mono">${t.ticker}</span>` : '';
-  const descLine = t && t.desc ? `<div class="codesc">${t.desc}</div>` : '';
-  const warnLine = t && t.note ? `<div class="codesc warn">⚠ ${t.note}</div>` : '';
-  return `<div class="coblock"><div class="conm">${name}${extra?`<small>${extra}</small>`:''}${tagChip}</div>${tickerTxt}${descLine}${warnLine}</div>`;
+  const nameHtml = `<span class="con">${name}${extra?`<small>${extra}</small>`:''}</span>`;
+  if(!t) return `<span class="co">${nameHtml}</span>`;
+  const tagChip = `<span class="cot ${t.conf==='low'?'lowconf':''}" onclick="toggleTag(this)">${t.tag||'详情'}</span>`;
+  const descBody = `${t.desc?t.desc:''}${t.ticker?` <span class="tk mono">${t.ticker}</span>`:''}${t.note?`<span class="wn">⚠ ${t.note}</span>`:''}`;
+  return `<span class="co">${nameHtml}${tagChip}<div class="cod">${descBody}</div></span>`;
 }
 function renderBoard(b){
-  let h=`<div class="card" style="overflow-x:auto"><table class="board-tbl"><tr><th>板块</th><th>涨停数量</th><th>龙一</th><th>龙二</th><th>龙三</th><th>日内龙头</th></tr>
-    ${b.sectors.map(s=>`<tr><td class="sctnm">${s.name}</td><td class="zt mono">${s.zt}</td><td>${coName(s.long1)}</td><td>${coName(s.long2)}</td><td>${coName(s.long3)}</td><td>${coName(s.intraday)}</td></tr>`).join('')}
-    </table></div>`;
+  // 板块龙虎榜（紧凑标准表格，与原图一致）
+  let h=`<div class="card"><div class="board-wrap"><table class="board-tbl">
+    <caption>板块涨停板复盘 (${b.date})</caption>
+    <tr><th>板块</th><th>涨停数量</th><th>龙一</th><th>龙二</th><th>龙三</th><th>日内龙头</th></tr>
+    ${b.sectors.map(s=>`<tr><td class="sctnm">${s.name}</td><td class="zt mono">${s.zt}</td><td>${coCell(s.long1)}</td><td>${coCell(s.long2)}</td><td>${coCell(s.long3)}</td><td>${coCell(s.intraday)}</td></tr>`).join('')}
+    </table></div></div>`;
+
+  // 市场情绪：一张四列表，左边连板核心，右边情绪指标（还原原图左右对齐结构）
   if(b.sentiment){
-    const lad=b.sentiment.ladder.map(l=>`<tr><td>${l.lv}</td><td><div class="names">${l.names.map(n=>coName(n)).join('')}</div></td></tr>`).join('');
-    const fb=b.sentiment.fanbao?`<tr><td>反包走势</td><td><div class="names">${b.sentiment.fanbao.map(f=>coName(f.name,f.info)).join('')}</div></td></tr>`:'';
-    const stats=b.sentiment.stats.map(s=>`<tr><td>${s.k}</td><td>${s.v}</td></tr>`).join('');
-    h+=`<div class="sent-grid">
-      <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">连板核心</div><table class="sent-tbl">${lad}${fb}</table></div>
-      <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">市场情绪指标</div><table class="stat-tbl">${stats}</table></div>
-    </div>`;
+    const leftRows=[...b.sentiment.ladder.map(l=>({cat:l.lv,val:l.names.map(n=>coCell(n)).join('、')}))];
+    if(b.sentiment.fanbao)leftRows.push({cat:'反包走势',val:b.sentiment.fanbao.map(f=>coCell(f.name,f.info)).join('、')});
+    const rightRows=b.sentiment.stats;
+    const rows=Math.max(leftRows.length,rightRows.length);
+    let body='';
+    for(let i=0;i<rows;i++){
+      const l=leftRows[i], r=rightRows[i];
+      const vcls = r ? (/^[-−]/.test(r.v) ? 'down' : /^[+＋]/.test(r.v) ? 'up' : '') : '';
+      body+=`<tr>
+        <td class="cat">${l?l.cat:''}</td><td>${l?l.val:''}</td>
+        <td class="cat">${r?r.k:''}</td><td class="num ${vcls}">${r?r.v:''}</td>
+      </tr>`;
+    }
+    h+=`<div class="card" style="margin-top:13px"><div class="board-wrap"><table class="board-tbl">
+      <caption>市场情绪</caption>
+      <tr><th>连板核心</th><th>标的</th><th>情绪指标</th><th>数值</th></tr>
+      ${body}
+    </table></div></div>`;
   }
+
+  // 龙虎榜游资动向：真实 rowspan 表格（游资类型 | 游资名称 | 股票名称 | 席位 | 金额），还原原图列结构
   if(b.hotMoney&&b.hotMoney.length){
-    const groups={};
-    b.hotMoney.forEach(x=>{const k=x.group;(groups[k]=groups[k]||[]).push(x);});
-    h+=`<div class="card" style="margin-top:13px"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">龙虎榜 · 主要游资 / 机构资金动向</div>
-      ${Object.keys(groups).map(g=>`<div class="hm-group"><div class="gh">${g}</div>${groups[g].map(x=>`<div class="hm-row"><span class="st">${coName(x.stock)}</span><span class="seat2">${x.seat||''}</span><span class="amt ${x.amt>=0?'up':'down'}">${x.label||((x.amt>=0?'+':'')+x.amt+'万')}</span></div>`).join('')}</div>`).join('')}
-    </div>`;
+    const rows=[];
+    b.hotMoney.forEach(g=>{
+      g.rows.forEach((r,i)=>rows.push({type:g.type,name:g.name,first:i===0,typeFirst:false,r}));
+    });
+    // 标记每个"游资类型"块的首行 + 该块总行数；每个"游资名称"子块的首行 + 子块行数
+    let i=0;
+    while(i<rows.length){
+      let j=i; while(j<rows.length && rows[j].type===rows[i].type) j++;
+      rows[i].typeFirst=true; rows[i].typeSpan=j-i;
+      let k=i;
+      while(k<j){
+        let m=k; while(m<j && rows[m].name===rows[k].name) m++;
+        rows[k].nameSpan=m-k;
+        k=m;
+      }
+      i=j;
+    }
+    const body=rows.map(row=>{
+      const r=row.r;
+      let tds='';
+      if(row.typeFirst) tds+=`<td class="cat" rowspan="${row.typeSpan}">${row.type}</td>`;
+      if(row.nameSpan) tds+=`<td class="cat" rowspan="${row.nameSpan}">${row.name||'—'}</td>`;
+      tds+=`<td>${coCell(r.stock)}</td><td class="seat">${r.seat||''}</td><td class="num ${r.amt>=0?'up':'down'}">${r.label}</td>`;
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    h+=`<div class="card" style="margin-top:13px"><div class="board-wrap"><table class="board-tbl">
+      <caption>龙虎榜主要游资动向</caption>
+      <tr><th>游资类型</th><th>游资名称</th><th>股票名称</th><th>席位</th><th>金额</th></tr>
+      ${body}
+    </table></div></div>`;
   }
   return h;
 }
