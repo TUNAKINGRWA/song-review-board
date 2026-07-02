@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>松松复盘日记 · 归档看板</title>
+<meta name="description" content="松松复盘日记——私人交易复盘知识库：每日大盘/资金/情绪归档、涨停板复盘、错题本与交易铁律库">
+<meta property="og:title" content="松松复盘日记 · 归档看板">
+<meta property="og:description" content="每日大盘/资金/情绪归档、涨停板复盘、错题本与交易铁律库">
 <style>
   :root{
     --bg:#faf6ef; --bg2:#fffdf9; --card:#ffffff; --card2:#f5efe4;
@@ -85,7 +88,7 @@
   .secnav a:hover{color:var(--orange);border-color:rgba(232,99,26,.35)}
 
   section{padding:20px 0;border-top:1px solid var(--line);margin-top:6px;scroll-margin-top:150px}
-  .sh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sh{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .sh .bar{width:5px;height:19px;border-radius:3px;background:var(--orange)}
   .sh h2{font-size:17px;font-weight:800}
   .sh .en{font-size:11px;color:var(--t3);letter-spacing:1px}
@@ -103,8 +106,8 @@
   .stat .v{font-size:20px;font-weight:800;margin:3px 0 1px}
   .stat .d{font-size:11px;color:var(--t2)}
   .vs{display:flex;height:36px;border-radius:9px;overflow:hidden;margin:4px 0}
-  .vs .l{background:var(--up);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
-  .vs .r{background:var(--down);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .vs .l{background:var(--up);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;min-width:76px;white-space:nowrap;padding:0 6px}
+  .vs .r{background:var(--down);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;min-width:76px;white-space:nowrap;padding:0 6px}
   .ladder{display:grid;gap:7px;margin-top:6px}
   .step{display:flex;align-items:center;gap:10px}
   .step .lv{font-size:11px;color:var(--t3);width:30px}
@@ -540,7 +543,7 @@ const DAYS = [
   },
   mood:{up:null,down:null,fear:null,
     headline:'当日以「涨停板复盘」为主线（见上方板块表），全市场涨/跌停总数手写笔记未单独记录，仅三大热点板块合计涨停57家。'},
-  flowMain:'半导体+专用设备+化学 净流入，光电子/电子制造/通信/国防军工 净流出',
+  flowMain:'半导体链回流，光模块/军工失血',
   flowIn:[{nm:'半导体',v:96},{nm:'专用设备',v:79},{nm:'化学',v:75}],
   flowOut:[{nm:'光电子',v:68},{nm:'电子制造',v:36},{nm:'通信',v:36},{nm:'国防军工',v:17}],
   flowNote:'单位已确认为亿元，个股金额指的是该股当日大单净流入（不是板块口径，你已确认"澜起+25"＝澜起科技单日大单净流入25亿，个股简称对应全称以此类推）。半导体内部：澜起科技(澜起)+25亿、汇顶科技(汇顶)+19亿、「北方」[?]+18亿、北方华创+9.9亿、「丛乐」[?]+8.0亿（这两个简称待你确认对应哪家公司）；专用设备：华工科技(华工)+25亿、中微公司(中微)+14亿、盛美上海(盛美)+13亿。这条资金流向与上方涨停板块（芯片/医药/核电）方向一致，互相印证今天是半导体全产业链的强势日。',
@@ -572,12 +575,12 @@ const NAV = [{d:'6/2',a:'325958.82',chg:'基准（首次入库）'}];
 
 /* 跨日趋势数据（按真实交易日标注） */
 const TREND = {
-  labels:['5/29','6/1','6/2','6/12'],
-  chip:[-808,-279.1,483.1,-84],
-  aiapp:[null,103.6,-91.0,null],
-  turnover:[3.32,2.88,2.79,3.21],
-  fear:[29,23,null,null],
-  zt:[49,118,64,88], dt:[50,21,7,15]
+  labels:['5/29','6/1','6/2','6/12','6/29'],
+  chip:[-808,-279.1,483.1,-84,96],
+  aiapp:[null,103.6,-91.0,null,null],
+  turnover:[3.32,2.88,2.79,3.21,3.52],
+  fear:[29,23,null,null,null],
+  zt:[49,118,64,88], dt:[50,21,7,15]   /* 6/29未记全市场涨跌停，柱图仅画前4日 */
 };
 
 /* 错题本 + 铁律库（聚合，持续累积） */
@@ -638,7 +641,7 @@ const TAGS = {
   '博迁新材':{ticker:'605376.SH',tag:'电子粉体材料',desc:'产MLCC用纳米镍粉等金属粉体，全球镍粉市占率第二的核心供应商',conf:'high'},
   '美埃科技':{ticker:'688376.SH',tag:'洁净室装备',desc:'生产风机过滤单元(FFU)及空气过滤器，为半导体/生物制药洁净室供货',conf:'high', note:'笔记中"美埕科技"疑为笔误，A股无此公司，应为"美埃科技"'},
 };
-function toggleTag(el){ el.nextElementSibling.classList.toggle('show'); }
+function toggleTag(el){ const d=el&&el.nextElementSibling; if(d&&d.classList.contains('cod'))d.classList.toggle('show'); }
 function coCell(name, extra){
   if(!name)return'';
   const t = TAGS[name];
@@ -646,7 +649,7 @@ function coCell(name, extra){
   if(!t) return `<span class="co">${nameHtml}</span>`;
   const tagChip = `<span class="cot ${t.conf==='low'?'lowconf':''}" onclick="toggleTag(this)">${t.tag||'详情'}</span>`;
   const descBody = `${t.desc?t.desc:''}${t.ticker?` <span class="tk mono">${t.ticker}</span>`:''}${t.note?`<span class="wn">⚠ ${t.note}</span>`:''}`;
-  return `<span class="co">${nameHtml}${tagChip}<div class="cod">${descBody}</div></span>`;
+  return `<span class="co">${nameHtml}${tagChip}<span class="cod">${descBody}</span></span>`;
 }
 function renderBoard(b){
   // 板块龙虎榜（紧凑标准表格，与原图一致）
@@ -719,7 +722,8 @@ function toggleSecret(el){
   if(el.dataset.shown==='1'){el.textContent='＊＊＊＊＊＊';el.dataset.shown='0';}
   else{el.textContent=el.dataset.val;el.dataset.shown='1';}
 }
-function maxAbs(a){return Math.max.apply(null,a.map(x=>Math.abs(x.v)))||1}
+function maxAbs(a){if(!a||!a.length)return 1;const m=Math.max.apply(null,a.map(x=>Math.abs(x.v)));return (isFinite(m)&&m>0)?m:1}
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function flowRows(items,color){const m=maxAbs(items);
   return items.map(x=>`<div class="r"><span class="nm">${x.nm}</span><div class="tk"><div class="f" style="width:${Math.abs(x.v)/m*100}%;background:${color}"></div></div><span class="v" style="color:${color}">${x.v>0?'+':'−'}${Math.abs(x.v)}</span></div>`).join('')}
 function stkRows(items,color,sign){const m=maxAbs(items);
@@ -753,16 +757,21 @@ function lineChart(labels,values,opts){
 }
 /* 简易分组柱图（涨停/跌停） */
 function barChart(labels,a,b){
-  const W=560,H=170,P={l:36,r:10,t:18,b:24};const mx=Math.max(...a,...b)*1.15;
+  const W=560,H=170,P={l:36,r:10,t:18,b:24};
+  const vals=[...a,...b].filter(v=>v!=null&&isFinite(v));
+  const mx=(vals.length?Math.max(...vals):1)*1.15||1;
   const gw=(W-P.l-P.r)/labels.length;
   let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
   labels.forEach((lb,i)=>{const x0=P.l+gw*i+gw*0.18,bw=gw*0.26;
-    const h1=(H-P.t-P.b)*a[i]/mx,h2=(H-P.t-P.b)*b[i]/mx;
-    s+=`<rect x="${x0}" y="${H-P.b-h1}" width="${bw}" height="${h1}" rx="3" fill="#dc3a3a"/>`;
-    s+=`<text x="${x0+bw/2}" y="${H-P.b-h1-5}" font-size="10.5" font-weight="700" fill="#dc3a3a" text-anchor="middle">${a[i]}</text>`;
-    s+=`<rect x="${x0+bw+5}" y="${H-P.b-h2}" width="${bw}" height="${h2}" rx="3" fill="#159b57"/>`;
-    s+=`<text x="${x0+bw+5+bw/2}" y="${H-P.b-h2-5}" font-size="10.5" font-weight="700" fill="#159b57" text-anchor="middle">${b[i]}</text>`;
-    s+=`<text x="${P.l+gw*i+gw/2}" y="${H-6}" font-size="10.5" fill="#9f9482" text-anchor="middle">${lb}</text>`;});
+    s+=`<text x="${P.l+gw*i+gw/2}" y="${H-6}" font-size="10.5" fill="#9f9482" text-anchor="middle">${lb}</text>`;
+    if(a[i]==null&&b[i]==null){s+=`<text x="${P.l+gw*i+gw/2}" y="${H-P.b-8}" font-size="10" fill="#c9beac" text-anchor="middle">未记</text>`;return;}
+    if(a[i]!=null){const h1=(H-P.t-P.b)*a[i]/mx;
+      s+=`<rect x="${x0}" y="${H-P.b-h1}" width="${bw}" height="${h1}" rx="3" fill="#dc3a3a"/>`;
+      s+=`<text x="${x0+bw/2}" y="${H-P.b-h1-5}" font-size="10.5" font-weight="700" fill="#dc3a3a" text-anchor="middle">${a[i]}</text>`;}
+    if(b[i]!=null){const h2=(H-P.t-P.b)*b[i]/mx;
+      s+=`<rect x="${x0+bw+5}" y="${H-P.b-h2}" width="${bw}" height="${h2}" rx="3" fill="#159b57"/>`;
+      s+=`<text x="${x0+bw+5+bw/2}" y="${H-P.b-h2-5}" font-size="10.5" font-weight="700" fill="#159b57" text-anchor="middle">${b[i]}</text>`;}
+  });
   return s+'</svg>';
 }
 
@@ -777,9 +786,11 @@ function renderDay(day){
     : (day.mood.up!=null ? `<div style="text-align:center"><div style="font-size:13px;color:var(--t2);margin-bottom:6px">当日未记恐慌指数</div><div style="font-size:14px">涨停 <b class="up">${day.mood.up}</b> / 跌停 <b class="down">${day.mood.down}</b></div></div>`
       : `<div style="text-align:center"><div style="font-size:13px;color:var(--t2)">${day.mood.headline||'当日以涨停板复盘为主'}</div></div>`);
   // 小节导航
+  const moodHas = day.mood && (day.mood.up!=null||day.mood.ladder||day.mood.sectors||day.mood.moodTxt||day.mood.headline||day.mood.fearNote);
   const navItems=[['mkt','大盘']];
   if(day.board)navItems.push(['board','涨停板复盘']);
-  navItems.push(['mood','情绪'],['flow','资金']);
+  if(moodHas)navItems.push(['mood','情绪']);
+  navItems.push(['flow','资金']);
   if(day.cUp)navItems.push(['contrib','贡献拆解']);
   if(day.trades)navItems.push(['live','⭐实盘']);
   if(day.themes)navItems.push(['theme',day.themes.title?day.themes.title.slice(0,4):'热点逻辑']);
@@ -801,20 +812,20 @@ function renderDay(day){
 
   if(day.board){h+=sec('board',`板块涨停板复盘 · ${day.board.date}`,'Limit-Up Board · 龙一/龙二/龙三 + 游资动向',renderBoard(day.board));}
 
-  let moodInner=`<div class="card">`;
-  if(day.mood.up!=null){moodInner+=`<div style="font-size:13px;color:var(--t2);margin-bottom:5px">涨停 vs 跌停</div>
+  let moodBody='';
+  if(day.mood.up!=null){moodBody+=`<div style="font-size:13px;color:var(--t2);margin-bottom:5px">涨停 vs 跌停</div>
     <div class="vs"><div class="l" style="flex:${day.mood.up}">涨停 ${day.mood.up}</div><div class="r" style="flex:${day.mood.down}">跌停 ${day.mood.down}</div></div>`;}
-  if(day.mood.ladder){moodInner+=`<div style="font-size:13px;color:var(--t2);margin:14px 0 2px">连板高度阶梯</div><div class="ladder">${day.mood.ladder.map(s=>s.brk?`<div class="step brk"><span class="lv">${s.lv}</span><div class="bw"><span class="em">⚠ ${s.txt}</span></div></div>`:`<div class="step"><span class="lv">${s.lv}</span><div class="bw"><div class="fl" style="width:${s.w}%;background:var(--orange)">${s.txt}</div></div></div>`).join('')}</div>`;}
-  if(day.mood.sectors){moodInner+=`<div style="margin-top:12px">活跃板块：${day.mood.sectors.map(s=>`<span class="chip hot">${s}</span>`).join('')}${day.mood.sectorsNote?`<span class="chip">${day.mood.sectorsNote}</span>`:''}</div>`;}
-  if(day.mood.moodTxt){moodInner+=`<div style="font-size:12.5px;color:var(--t2);margin-top:12px">${day.mood.moodTxt}</div>`;}
-  moodInner+=`</div>`;
+  if(day.mood.ladder){moodBody+=`<div style="font-size:13px;color:var(--t2);margin:14px 0 2px">连板高度阶梯</div><div class="ladder">${day.mood.ladder.map(s=>s.brk?`<div class="step brk"><span class="lv">${s.lv}</span><div class="bw"><span class="em">⚠ ${s.txt}</span></div></div>`:`<div class="step"><span class="lv">${s.lv}</span><div class="bw"><div class="fl" style="width:${s.w}%;background:var(--orange)">${s.txt}</div></div></div>`).join('')}</div>`;}
+  if(day.mood.sectors){moodBody+=`<div style="margin-top:12px">活跃板块：${day.mood.sectors.map(s=>`<span class="chip hot">${s}</span>`).join('')}${day.mood.sectorsNote?`<span class="chip">${day.mood.sectorsNote}</span>`:''}</div>`;}
+  if(day.mood.moodTxt){moodBody+=`<div style="font-size:12.5px;color:var(--t2);margin-top:12px">${day.mood.moodTxt}</div>`;}
+  if(!moodBody&&day.mood.headline){moodBody=`<div style="font-size:12.5px;color:var(--t2)">${day.mood.headline}</div>`;}
   const fearCard = day.mood.fearNote?`<div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">恐慌指数解读</div><div style="display:flex;align-items:center;gap:16px"><div style="font-size:46px;font-weight:800;color:var(--orange);line-height:1" class="mono">${day.mood.fear}</div><div style="font-size:12.5px;color:var(--t2)">${day.mood.fearNote}</div></div></div>`:'';
-  h+=sec('mood','市场情绪','Sentiment',`<div class="grid ${fearCard?'c2':''}">${moodInner}${fearCard}</div>`);
+  if(moodBody||fearCard){h+=sec('mood','市场情绪','Sentiment',`<div class="grid ${fearCard?'c2':''}">${moodBody?`<div class="card">${moodBody}</div>`:''}${fearCard}</div>`);}
 
   let fund=`<div class="grid c2">
     <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">净流入（绿）</div><div class="fl">${flowRows(day.flowIn,'#159b57')}</div></div>
     <div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">净流出（橙红）</div><div class="fl">${flowRows(day.flowOut.map(x=>({nm:x.nm,v:-x.v})),'#dc3a3a')}</div></div></div>`;
-  if(day.natTeam){fund+=`<div class="card" style="margin-top:13px"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">国家队 / 主题资金（净流入 亿元）</div><div class="fl">${day.natTeam.map(x=>`<div class="r" style="grid-template-columns:104px 1fr 60px"><span class="nm">${x.nm}</span><div class="tk"><div class="f" style="width:${x.v/maxAbs(day.natTeam)*100}%;background:var(--gold)"></div></div><span class="v down">+${x.v}</span></div>`).join('')}</div><div style="margin-top:10px">领涨权重：${day.leaders.map(l=>`<span class="chip">${l}</span>`).join('')}</div></div>`;}
+  if(day.natTeam){fund+=`<div class="card" style="margin-top:13px"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">国家队 / 主题资金（净流入 亿元）</div><div class="fl">${day.natTeam.map(x=>`<div class="r" style="grid-template-columns:104px 1fr 60px"><span class="nm">${x.nm}</span><div class="tk"><div class="f" style="width:${x.v/maxAbs(day.natTeam)*100}%;background:var(--gold)"></div></div><span class="v down">+${x.v}</span></div>`).join('')}</div>${(day.leaders&&day.leaders.length)?`<div style="margin-top:10px">领涨权重：${day.leaders.map(l=>`<span class="chip">${l}</span>`).join('')}</div>`:''}</div>`;}
   if(day.flowNote){fund+=`<div class="card" style="margin-top:13px;font-size:12.5px;color:var(--t2)">${day.flowNote}</div>`;}
   if(day.natNote){fund+=`<div style="font-size:12px;color:var(--t3);margin-top:9px">${day.natNote}</div>`;}
   h+=sec('flow',`资金流向 · 主线「${day.flowMain}」`,'Capital Flow · 亿元',fund);
@@ -824,10 +835,12 @@ function renderDay(day){
     <div class="card"><div style="font-size:13px;margin-bottom:10px"><span class="down">▼</span> ${day.cDownLabel}</div>${stkRows(day.cDown,'#159b57','−')}</div></div>`);}
 
   if(day.trades){
-    h+=sec('live','⭐ 实盘记录 + 错题','Live Trading',`<div class="grid c2">
-      <div class="card"><table class="tradetab"><tr><th>持仓</th><th>价格</th><th>数量</th></tr>${day.trades.hold.map(t=>`<tr><td>${t.nm}</td><td class="mono">${t.px}</td><td class="mono">${t.qty}</td></tr>`).join('')}</table>
-        <div class="assets">收盘总资产 <b class="mono secret" data-val="${day.trades.assets}" onclick="toggleSecret(this)">＊＊＊＊＊＊</b> 元 <span style="font-size:11px;color:var(--t3)">（点一下显示/隐藏）</span></div></div>
-      <div class="card err"><div style="font-size:13px;color:var(--up);font-weight:700">错题 · 自我复盘</div><div class="res">${day.trades.mistake.res}</div><div style="font-size:12.5px;color:var(--t2)">${day.trades.mistake.txt}</div></div></div>`);
+    const mk=day.trades.mistake;
+    const mistakeCard=mk?`<div class="card err"><div style="font-size:13px;color:var(--up);font-weight:700">错题 · 自我复盘</div><div class="res">${mk.res}</div><div style="font-size:12.5px;color:var(--t2)">${mk.txt}</div></div>`:'';
+    h+=sec('live',mk?'⭐ 实盘记录 + 错题':'⭐ 实盘记录','Live Trading',`<div class="grid ${mistakeCard?'c2':''}">
+      <div class="card"><table class="tradetab"><tr><th>持仓</th><th>价格</th><th>数量</th></tr>${(day.trades.hold||[]).map(t=>`<tr><td>${t.nm}</td><td class="mono">${t.px}</td><td class="mono">${t.qty}</td></tr>`).join('')}</table>
+        ${day.trades.assets?`<div class="assets">收盘总资产 <b class="mono secret" data-val="${escHtml(day.trades.assets)}" onclick="toggleSecret(this)">＊＊＊＊＊＊</b> 元 <span style="font-size:11px;color:var(--t3)">（点一下显示/隐藏）</span></div>`:''}</div>
+      ${mistakeCard}</div>`);
   }
   if(day.themes){
     h+=sec('theme',day.themes.title||'热点逻辑链 · 主线衍生','Theme Map',
@@ -845,22 +858,22 @@ function renderDay(day){
 function renderStory(){
   let h=`<div class="hero"><div><div class="eye">跨日脉络 · 按交易日对齐</div><h1>高切低 → 一日反转 → 认错切回</h1>
     <div class="meta"><span class="pill">芯片资金一天反转762亿</span><span class="pill">焦煤切换被打脸</span><span class="pill warn">⚠ 单日资金不外推</span></div></div></div>`;
-  h+=sec('s1','芯片资金净流向 · 三日反转','本周最震撼的一张图',
-    `<div class="card chart-card"><div class="ttl"><b>芯片/半导体板块资金净额（亿元）</b><span class="cap">−808→−279→+483→−84</span></div>
+  h+=sec('s1','芯片资金净流向 · 跨日反转','最震撼的一张图',
+    `<div class="card chart-card"><div class="ttl"><b>芯片/半导体板块资金净额（亿元）</b><span class="cap">−808→−279→+483→−84→+96</span></div>
      ${lineChart(TREND.labels,TREND.chip,{pn:1,zero:1})}
-     <div style="font-size:12px;color:var(--t2);margin-top:8px">5/29 大出逃 −808亿 → 6/1 收窄 → 6/2 暴力回流 +483亿 → 6/12 又流出 −84亿。<b style="color:var(--cream)">方向反复横跳——这就是「单日资金不外推」最直观的证据。</b></div></div>
-    <div class="card chart-card" style="margin-top:13px"><div class="ttl"><b>AI应用板块资金净额（亿元）</b><span class="cap">+103.6 → −91 · 与芯片镜像</span></div>
+     <div style="font-size:12px;color:var(--t2);margin-top:8px">5/29 大出逃 −808亿 → 6/1 收窄 → 6/2 暴力回流 +483亿 → 6/12 又流出 −84亿 → 6/29 再回流 +96亿。<b style="color:var(--cream)">五个点四次变向——这就是「单日资金不外推」最直观的证据。</b></div></div>
+    <div class="card chart-card" style="margin-top:13px"><div class="ttl"><b>AI应用板块资金净额（亿元）</b><span class="cap">+103.6 → −91 · 与芯片镜像（其余日未记）</span></div>
      ${lineChart(TREND.labels,TREND.aiapp,{pn:1,zero:1})}
      <div style="font-size:12px;color:var(--t2);margin-top:8px">6/1 资金切进 AI 应用（+103.6），6/2 就被抽走（−91）。<b style="color:var(--cream)">承接主线一日游，验证「AI应用用博弈仓、不当底仓」。</b></div></div>`);
-  h+=sec('s2','量能与情绪 · 三日对照','Volume & Sentiment',
+  h+=sec('s2','量能与情绪 · 跨日对照','Volume & Sentiment',
     `<div class="grid c2">
-      <div class="card chart-card"><div class="ttl"><b>两市成交额（万亿）</b><span class="cap">放量破位 → 连续缩量</span></div>${lineChart(TREND.labels,TREND.turnover,{color:'#caa24a'})}</div>
-      <div class="card chart-card"><div class="ttl"><b>恐慌指数</b><span class="cap">29 → 23（6/2未记）</span></div>${lineChart(TREND.labels,TREND.fear,{color:'#e8631a'})}</div></div>
-    <div class="card chart-card" style="margin-top:13px"><div class="ttl"><b>涨停（红） vs 跌停（绿）家数</b><span class="cap">情绪结构三日变化</span></div>${barChart(TREND.labels,TREND.zt,TREND.dt)}
-    <div style="font-size:12px;color:var(--t2);margin-top:6px">5/29 涨49/跌50（杀跌）→ 6/1 涨停118（个股修复但指数跌）→ 6/2 涨停64跌停仅7（指数涨但小票被抽血）。<b style="color:var(--cream)">涨跌停结构比指数更真实。</b></div></div>`);
+      <div class="card chart-card"><div class="ttl"><b>两市成交额（万亿）</b><span class="cap">放量破位 → 缩量 → 6/12、6/29 放量回升</span></div>${lineChart(TREND.labels,TREND.turnover,{color:'#caa24a'})}</div>
+      <div class="card chart-card"><div class="ttl"><b>恐慌指数</b><span class="cap">29 → 23（其后未记）</span></div>${lineChart(TREND.labels,TREND.fear,{color:'#e8631a'})}</div></div>
+    <div class="card chart-card" style="margin-top:13px"><div class="ttl"><b>涨停（红） vs 跌停（绿）家数</b><span class="cap">情绪结构变化（6/29未记全市场数据，图截至6/12）</span></div>${barChart(TREND.labels.slice(0,TREND.zt.length),TREND.zt,TREND.dt)}
+    <div style="font-size:12px;color:var(--t2);margin-top:6px">5/29 涨49/跌50（杀跌）→ 6/1 涨停118（个股修复但指数跌）→ 6/2 涨停64跌停仅7（指数涨但小票被抽血）→ 6/12 涨停88跌停15（全面转暖）。<b style="color:var(--cream)">涨跌停结构比指数更真实。</b></div></div>`);
   const nodes = DAYS.map(d=>`<div class="snode"><div class="dd">${d.d}</div><div class="card"><div class="tt">${d.q}</div><div class="tx"><b>主线：</b>${d.flowMain}</div></div></div>`).join('');
   h+=sec('s3','主线演进','Evolution',`<div class="story">${nodes}</div><div style="font-size:11.5px;color:var(--t3);text-align:center;margin-top:8px">每天的资金主线都在变、方向反复——这就是为什么「单日不外推、当日认错」是铁律。</div>`);
-  const navrows = NAV.map(n=>`<tr><td>${n.d}</td><td><span class="mono secret" data-val="${n.a}" onclick="toggleSecret(this)">＊＊＊＊＊＊</span></td><td>${n.chg}</td></tr>`).join('');
+  const navrows = NAV.map(n=>`<tr><td>${n.d}</td><td><span class="mono secret" data-val="${escHtml(n.a)}" onclick="toggleSecret(this)">＊＊＊＊＊＊</span></td><td>${n.chg}</td></tr>`).join('');
   h+=sec('s4','实盘净值','NAV',`<div class="card"><table class="tradetab"><tr><th>日期</th><th>收盘总资产</th><th>变动</th></tr>${navrows}</table><div style="font-size:12px;color:var(--t3);margin-top:10px">每天补一行收盘总资产，攒3个点以上自动画净值曲线。（点 ＊ 显示金额）</div></div>`);
   return h;
 }
@@ -891,7 +904,15 @@ function dayText(day){
   (day.cDown||[]).forEach(x=>parts.push(['指数贡献·砸盘',x.nm+' −'+x.v+(x.pc?' '+x.pc:'')]));
   (day.plan||[]).forEach(x=>parts.push(['操盘计划',x.nm+' '+x.ps+' · '+x.nt]));
   if(day.themes)(day.themes.items||[]).forEach(t=>{t.tks.forEach(k=>parts.push([t.nm,k.t]));});
-  if(day.trades){day.trades.hold.forEach(t=>parts.push(['实盘持仓',t.nm+' '+t.px+'×'+t.qty]));parts.push(['错题',day.trades.mistake.txt]);}
+  if(day.trades){(day.trades.hold||[]).forEach(t=>parts.push(['实盘持仓',t.nm+' '+t.px+'×'+t.qty]));if(day.trades.mistake)parts.push(['错题',day.trades.mistake.txt]);}
+  if(day.board){
+    (day.board.sectors||[]).forEach(s=>parts.push(['涨停板·'+s.name,[s.long1,s.long2,s.long3,s.intraday].filter(Boolean).join('、')+' · 涨停'+s.zt+'家']));
+    const st=day.board.sentiment;
+    if(st){(st.ladder||[]).forEach(l=>parts.push(['连板·'+l.lv,(l.names||[]).join('、')]));
+      (st.fanbao||[]).forEach(f=>parts.push(['反包走势',f.name+' '+(f.info||'')]));}
+    (day.board.hotMoney||[]).forEach(g=>(g.rows||[]).forEach(r=>parts.push(['龙虎榜·'+g.type,(g.name?g.name+' · ':'')+r.stock+' '+(r.seat||'')+' '+(r.label||'')])));
+  }
+  (day.rules||[]).forEach(r=>parts.push(['铁律',r.replace(/<[^>]+>/g,'')]));
   (day.read||[]).forEach(r=>parts.push(['解读',r.replace(/<[^>]+>/g,'')]));
   return parts;
 }
@@ -912,25 +933,39 @@ function doSearch(q){
   });
   box.innerHTML = hits.length
     ? hits.map(x=>`<div class="it" onclick="select('${x.di}');document.getElementById('sres').classList.remove('show');document.getElementById('q').value=''"><div class="dd">${x.d} · ${x.where}</div><div class="tx">${x.frag}</div></div>`).join('')
-    : `<div class="none">没搜到「${q}」，换个词试试</div>`;
+    : `<div class="none">没搜到「${escHtml(q)}」，换个词试试</div>`;
   box.classList.add('show');
 }
 
 /* ============ 路由与构建 ============ */
-function jumpSec(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+function jumpSec(id){
+  const el=document.getElementById(id);if(!el)return;
+  const top=document.querySelector('.top');
+  const off=(top?top.offsetHeight:0)+10;   // 动态量 sticky 头部高度（移动端可折成200px+）
+  window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-off,behavior:'smooth'});
+}
 function build(){
   const tl=document.getElementById('timeline');
   tl.innerHTML=DAYS.map((d,i)=>`<div class="tl" data-i="${i}"><div class="d">${d.d}<span class="wd">${d.wd}</span></div><div class="q">${d.q}</div></div>`).join('')
     +`<div class="tl flow" data-i="story"><div class="ic">📈</div><div class="lb">脉络/图表</div></div>`
     +`<div class="tl flow" data-i="rules"><div class="ic">📕</div><div class="lb">错题&铁律</div></div>`;
   tl.querySelectorAll('.tl').forEach(el=>el.addEventListener('click',()=>select(el.dataset.i)));
-  // URL hash 路由：#2026-06-01 / #story / #rules
-  const hash=decodeURIComponent(location.hash.replace('#',''));
-  let init=String(DAYS.length-1);
-  if(hash==='story'||hash==='rules')init=hash;
-  else{const di=DAYS.findIndex(d=>d.id===hash||d.d===hash);if(di>-1)init=String(di);}
-  select(init,true);
+  select(hashToIndex(location.hash),true);
 }
+/* hash → 视图索引（build 初始化与 hashchange 共用） */
+function hashToIndex(hash){
+  const h=decodeURIComponent((hash||'').replace('#',''));
+  if(h==='story'||h==='rules')return h;
+  const di=DAYS.findIndex(d=>d.id===h||d.d===h);
+  return di>-1?String(di):String(DAYS.length-1);
+}
+/* 浏览器后退/前进：hash 变了就同步视图 */
+window.addEventListener('hashchange',()=>{
+  const target=hashToIndex(location.hash);
+  const act=document.querySelector('.tl.active');
+  if(act&&act.dataset.i===target)return;   // 视图已一致（select 自己写 hash 触发的场景）
+  select(target,true);
+});
 function select(i,noScroll){
   document.querySelectorAll('.tl').forEach(el=>el.classList.toggle('active',el.dataset.i===i));
   const view=document.getElementById('view');
@@ -965,9 +1000,10 @@ function renderLive(){
   const box=document.getElementById('ticker');if(!box)return;
   let ok=false,cards='',ts='';
   IDX_LIVE.forEach(x=>{
-    const raw=window['v_'+x.code];if(!raw)return;ok=true;
+    const raw=window['v_'+x.code];if(!raw)return;
     const a=raw.split('~');const px=parseFloat(a[3]),prev=parseFloat(a[4]);
     if(!px){return;}
+    ok=true;   // 价格解析成功才算真取到（避免接口异常时渲染出空行情条）
     const pct=prev?(px-prev)/prev*100:0;const up=pct>=0,col=up?'#dc3a3a':'#159b57';
     if(!ts)ts=liveTime(a[30]);
     cards+=`<div class="lq"><span class="nm">${x.nm}</span><span class="px" style="color:${col}">${px.toFixed(2)}</span><span class="pc" style="color:${col}">${up?'+':''}${pct.toFixed(2)}%</span></div>`;
@@ -977,6 +1013,7 @@ function renderLive(){
 }
 function loadLive(){
   const box=document.getElementById('ticker');if(!box)return;
+  IDX_LIVE.forEach(x=>{try{delete window['v_'+x.code]}catch(e){}});   // 清掉旧数据，防止接口异常时拿陈旧价当"实时"
   const s=document.createElement('script');s.charset='gbk';
   s.src='https://qt.gtimg.cn/q='+IDX_LIVE.map(x=>x.code).join(',')+'&r='+Date.now();
   s.onload=()=>{renderLive();s.remove();};
@@ -984,7 +1021,8 @@ function loadLive(){
   document.body.appendChild(s);
 }
 loadLive();
-setInterval(loadLive,60000);  // 盘中每60秒自动刷新
+setInterval(()=>{if(!document.hidden)loadLive()},60000);   // 盘中每60秒刷新；后台标签页不白跑
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadLive()});   // 切回来立刻补一次
 
 build();
 </script>
