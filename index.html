@@ -148,6 +148,9 @@
   .foot summary{cursor:pointer;font-size:12.5px;color:var(--t3);user-select:none}
   .foot summary:hover{color:var(--orange)}
   .foot .todo{margin-top:14px}
+  /* 表格卡：围绕表格收紧内边距 */
+  .tcard{padding:8px 10px}
+  .tcard+.tcard{margin-top:16px}
   /* 双栏合一卡 */
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:0}
   .duo>div{padding:0 26px 0 0}
@@ -805,6 +808,9 @@ function stkRows(items,color,sign){const m=maxAbs(items);
   return items.map(x=>`<div class="stk"><span>${x.nm}</span><div class="tk"><div class="f" style="width:${Math.abs(x.v)/m*100}%;background:${color}"></div></div><span class="pt" style="color:${color}">${sign}${x.v} ${x.pc?`<small>${x.pc}</small>`:''}</span></div>`).join('')}
 let SECN=0;   // 章节编号，每次渲染视图前归零
 function sec(id,title,en,inner){SECN++;return `<section id="${id}"><div class="sh"><span class="num">${String(SECN).padStart(2,'0')}</span><h2>${title}</h2>${en?`<span class="en">${en}</span>`:''}</div>${inner}</section>`}
+/* 统一数据表格（与涨停板复盘同一套表格语言：列头米底+斑马纹+红绿数字） */
+function dtable(cols,rowsHtml){return `<div class="card tcard"><div class="board-wrap"><table class="board-tbl">
+  <tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>${rowsHtml}</table></div></div>`}
 
 /* SVG 折线图（带零轴、正负配色、数值标签） */
 function lineChart(labels,values,opts){
@@ -878,40 +884,53 @@ function renderDay(day){
       <div class="sub">${day.tags.map(t=>t.w?`<span class="warn">⚠ ${t.t}</span>`:`<span>${t.t}</span>`).join('<span class="sep">·</span>')}</div></div>${gauge}</div>
       <div class="secnav">${navItems.map(n=>`<a href="javascript:void(0)" onclick="jumpSec('${n[0]}')">${n[1]}</a>`).join('')}</div>`;
 
+  const idxRows=day.idx.map(i=>`<tr><td class="sctnm">${i.nm} <span class="tag ${i.tagu?'u':''}">${i.tag}</span></td><td class="num ${i.dir}" style="font-family:var(--serif);font-size:17px">${i.cl}</td><td class="num ${i.dir}">${i.cg}</td><td class="num mono" style="font-weight:500">${i.open}</td><td class="mono" style="color:var(--t3)">${i.range}</td></tr>`).join('');
+  const macroRows=day.macro.map(m=>`<tr><td class="sctnm">${m.k}</td><td class="num" style="font-family:var(--serif);font-size:15px">${m.v}</td><td style="color:var(--t2)">${m.d}</td></tr>`).join('');
   h+=sec('mkt','大盘快照','Market',
-    `<div class="idxstrip">${day.idx.map(i=>`<div class="idxcell">
-      <div class="nm">${i.nm}<span class="tag ${i.tagu?'u':''}">${i.tag}</span></div>
-      <div class="cl ${i.dir}">${i.cl}</div><div class="cg ${i.dir}">${i.cg}</div>
-      <div class="ex"><div class="r"><span>开盘</span><span class="mono">${i.open}</span></div><div class="r"><span>振幅/区间</span><span class="mono">${i.range}</span></div></div></div>`).join('')}</div>
-    <div class="statstrip">${day.macro.map(m=>`<div class="s"><div class="k">${m.k}</div><div class="v mono">${m.v}</div><div class="d">${m.d}</div></div>`).join('')}</div>
-    ${day.macroNote?`<p class="capnote">${day.macroNote}</p>`:''}
+    dtable(['指数','收盘','涨跌幅','开盘','振幅/区间'],idxRows)
+    +dtable(['关键指标','数值','备注'],macroRows)
+    +`${day.macroNote?`<p class="capnote">${day.macroNote}</p>`:''}
     ${day.cycleNote?`<div class="card cyclecard" style="margin-top:18px"><div class="cyt">${day.cycleNote.title}</div><div class="cyb">${day.cycleNote.body}</div><div class="cys">${day.cycleNote.signal}</div></div>`:''}`);
 
   if(day.board){h+=sec('board',`板块涨停板复盘 · ${day.board.date}`,'Limit-Up Board · 龙一/龙二/龙三 + 游资动向',renderBoard(day.board));}
 
-  let moodBody='';
-  if(day.mood.up!=null){moodBody+=`<div style="font-size:13px;color:var(--t2);margin-bottom:5px">涨停 vs 跌停</div>
-    <div class="vs"><div class="l" style="flex:${day.mood.up}">涨停 ${day.mood.up}</div><div class="r" style="flex:${day.mood.down}">跌停 ${day.mood.down}</div></div>`;}
-  if(day.mood.ladder){moodBody+=`<div style="font-size:13px;color:var(--t2);margin:14px 0 2px">连板高度阶梯</div><div class="ladder">${day.mood.ladder.map(s=>s.brk?`<div class="step brk"><span class="lv">${s.lv}</span><div class="bw"><span class="em">⚠ ${s.txt}</span></div></div>`:`<div class="step"><span class="lv">${s.lv}</span><div class="bw"><div class="fl" style="width:${s.w}%;background:var(--orange)">${s.txt}</div></div></div>`).join('')}</div>`;}
-  if(day.mood.sectors){moodBody+=`<div style="margin-top:12px">活跃板块：${day.mood.sectors.map(s=>`<span class="chip hot">${s}</span>`).join('')}${day.mood.sectorsNote?`<span class="chip">${day.mood.sectorsNote}</span>`:''}</div>`;}
-  if(day.mood.moodTxt){moodBody+=`<div style="font-size:12.5px;color:var(--t2);margin-top:12px">${day.mood.moodTxt}</div>`;}
-  if(!moodBody&&day.mood.headline){moodBody=`<div style="font-size:12.5px;color:var(--t2)">${day.mood.headline}</div>`;}
-  const fearCard = day.mood.fearNote?`<div class="card"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">恐慌指数解读</div><div style="display:flex;align-items:center;gap:16px"><div style="font-size:46px;font-weight:800;color:var(--orange);line-height:1" class="mono">${day.mood.fear}</div><div style="font-size:12.5px;color:var(--t2)">${day.mood.fearNote}</div></div></div>`:'';
-  if(moodBody||fearCard){h+=sec('mood','市场情绪','Sentiment',`<div class="grid ${fearCard?'c2':''}">${moodBody?`<div class="card">${moodBody}</div>`:''}${fearCard}</div>`);}
+  let moodRows='';
+  if(day.mood.up!=null){
+    moodRows+=`<tr><td class="sctnm">涨停家数</td><td class="num up">${day.mood.up}</td><td style="color:var(--t2)">${day.mood.up>day.mood.down?'涨停占优':''}</td></tr>`;
+    moodRows+=`<tr><td class="sctnm">跌停家数</td><td class="num down">${day.mood.down}</td><td style="color:var(--t2)">${day.mood.down>=day.mood.up?'杀跌占优':''}</td></tr>`;
+  }
+  if(day.mood.fear!=null)moodRows+=`<tr><td class="sctnm">恐慌指数</td><td class="num" style="color:var(--orange);font-family:var(--serif);font-size:15px">${day.mood.fear}</td><td style="color:var(--t2)">${day.mood.fearc||''}</td></tr>`;
+  if(day.mood.sectors)moodRows+=`<tr><td class="sctnm">活跃板块</td><td colspan="2">${day.mood.sectors.map(s=>`<span class="chip hot">${s}</span>`).join('')}${day.mood.sectorsNote?`<span class="chip">${day.mood.sectorsNote}</span>`:''}</td></tr>`;
+  let moodExtra='';
+  if(day.mood.ladder){moodExtra+=`<div class="card" style="margin-top:16px"><div style="font-size:13px;color:var(--t2);margin-bottom:10px">连板高度阶梯</div><div class="ladder">${day.mood.ladder.map(s=>s.brk?`<div class="step brk"><span class="lv">${s.lv}</span><div class="bw"><span class="em">⚠ ${s.txt}</span></div></div>`:`<div class="step"><span class="lv">${s.lv}</span><div class="bw"><div class="fl" style="width:${s.w}%;background:var(--orange)">${s.txt}</div></div></div>`).join('')}</div></div>`;}
+  if(day.mood.fearNote)moodExtra+=`<p class="capnote"><b style="color:var(--cream)">恐慌指数解读：</b>${day.mood.fearNote}</p>`;
+  if(day.mood.moodTxt)moodExtra+=`<p class="capnote">${day.mood.moodTxt}</p>`;
+  if(!moodRows&&!moodExtra&&day.mood.headline)moodExtra=`<p class="capnote">${day.mood.headline}</p>`;
+  if(moodRows||moodExtra){h+=sec('mood','市场情绪','Sentiment',`${moodRows?dtable(['情绪指标','数值','解读'],moodRows):''}${moodExtra}`);}
 
-  let fund=`<div class="card"><div class="duo">
-    <div><div style="font-size:13px;color:var(--t2);margin-bottom:12px">净流入（绿）</div><div class="fl">${flowRows(day.flowIn,'#4f8456')}</div></div>
-    <div><div style="font-size:13px;color:var(--t2);margin-bottom:12px">净流出（砖红）</div><div class="fl">${flowRows(day.flowOut.map(x=>({nm:x.nm,v:-x.v})),'#bf4a30')}</div></div>
-  </div></div>`;
-  if(day.natTeam){fund+=`<div class="card" style="margin-top:18px"><div style="font-size:13px;color:var(--t2);margin-bottom:12px">国家队 / 主题资金（净流入 亿元）</div><div class="fl">${day.natTeam.map(x=>`<div class="r" style="grid-template-columns:104px 1fr 60px"><span class="nm">${x.nm}</span><div class="tk"><div class="f" style="width:${x.v/maxAbs(day.natTeam)*100}%;background:var(--gold)"></div></div><span class="v down">+${x.v}</span></div>`).join('')}</div>${(day.leaders&&day.leaders.length)?`<div style="margin-top:12px">领涨权重：${day.leaders.map(l=>`<span class="chip">${l}</span>`).join('')}</div>`:''}</div>`;}
+  const inMax=maxAbs(day.flowIn), outMax=maxAbs(day.flowOut);
+  const flowTblRows=
+    day.flowIn.map((x,i)=>`<tr>${i===0?`<td class="cat" rowspan="${day.flowIn.length}" style="color:var(--down)">▲ 净流入</td>`:''}<td class="sctnm">${x.nm}</td><td class="num down">+${x.v}</td><td><div class="tk" style="height:12px;background:var(--card2);border-radius:4px;overflow:hidden;min-width:120px"><div style="height:100%;width:${Math.abs(x.v)/inMax*100}%;background:var(--down);border-radius:4px"></div></div></td></tr>`).join('')
+    +day.flowOut.map((x,i)=>`<tr>${i===0?`<td class="cat" rowspan="${day.flowOut.length}" style="color:var(--up)">▼ 净流出</td>`:''}<td class="sctnm">${x.nm}</td><td class="num up">−${x.v}</td><td><div class="tk" style="height:12px;background:var(--card2);border-radius:4px;overflow:hidden;min-width:120px"><div style="height:100%;width:${Math.abs(x.v)/outMax*100}%;background:var(--up);border-radius:4px"></div></div></td></tr>`).join('');
+  let fund=dtable(['方向','板块','净额(亿元)','力度'],flowTblRows);
+  if(day.natTeam){
+    const natRows=day.natTeam.map(x=>`<tr><td class="sctnm">${x.nm}</td><td class="num down">+${x.v}</td><td><div class="tk" style="height:12px;background:var(--card2);border-radius:4px;overflow:hidden;min-width:120px"><div style="height:100%;width:${x.v/maxAbs(day.natTeam)*100}%;background:var(--gold);border-radius:4px"></div></div></td></tr>`).join('')
+      +((day.leaders&&day.leaders.length)?`<tr><td class="sctnm">领涨权重</td><td colspan="2">${day.leaders.map(l=>`<span class="chip">${l}</span>`).join('')}</td></tr>`:'');
+    fund+=dtable(['国家队/主题资金','净流入(亿元)','力度'],natRows);
+  }
   if(day.flowNote){fund+=`<p class="capnote">${day.flowNote}</p>`;}
   if(day.natNote){fund+=`<p class="capnote">${day.natNote}</p>`;}
   h+=sec('flow',`资金流向 · 主线「${day.flowMain}」`,'Capital Flow · 亿元',fund);
 
-  if(day.cUp){h+=sec('contrib','指数贡献拆解','Index Points',`<div class="card"><div class="duo">
-    <div><div style="font-size:13px;margin-bottom:12px"><span class="up">▲</span> ${day.cUpLabel}</div>${stkRows(day.cUp,'#bf4a30','+')}</div>
-    <div><div style="font-size:13px;margin-bottom:12px"><span class="down">▼</span> ${day.cDownLabel}</div>${stkRows(day.cDown,'#4f8456','−')}</div>
-  </div></div>`);}
+  if(day.cUp){
+    const cUpMax=maxAbs(day.cUp), cDnMax=maxAbs(day.cDown);
+    const contribRows=
+      day.cUp.map((x,i)=>`<tr>${i===0?`<td class="cat" rowspan="${day.cUp.length}" style="color:var(--up)">▲ 护盘</td>`:''}<td class="sctnm">${x.nm}</td><td class="num up">+${x.v}</td><td class="num" style="color:var(--t2);font-weight:500">${x.pc||''}</td><td><div class="tk" style="height:12px;background:var(--card2);border-radius:4px;overflow:hidden;min-width:110px"><div style="height:100%;width:${Math.abs(x.v)/cUpMax*100}%;background:var(--up);border-radius:4px"></div></div></td></tr>`).join('')
+      +day.cDown.map((x,i)=>`<tr>${i===0?`<td class="cat" rowspan="${day.cDown.length}" style="color:var(--down)">▼ 拖累</td>`:''}<td class="sctnm">${x.nm}</td><td class="num down">−${x.v}</td><td class="num" style="color:var(--t2);font-weight:500">${x.pc||''}</td><td><div class="tk" style="height:12px;background:var(--card2);border-radius:4px;overflow:hidden;min-width:110px"><div style="height:100%;width:${Math.abs(x.v)/cDnMax*100}%;background:var(--down);border-radius:4px"></div></div></td></tr>`).join('');
+    h+=sec('contrib','指数贡献拆解','Index Points',
+      dtable(['方向','个股','贡献点数','当日涨跌','力度'],contribRows)
+      +`<p class="capnote">▲ ${day.cUpLabel}　　▼ ${day.cDownLabel}</p>`);
+  }
 
   if(day.trades){
     const mk=day.trades.mistake;
@@ -922,11 +941,20 @@ function renderDay(day){
       ${mistakeCard}</div>`);
   }
   if(day.themes){
+    const themeRows=day.themes.items.map(t=>`<tr>
+      <td class="sctnm" style="${t.avoid?'color:var(--down)':''}">${t.ic} ${t.nm}</td>
+      <td style="color:var(--t2)">${t.desc}${t.mts.map(m=>`<br><span style="color:var(--t3);font-size:11.5px">${m.k}：</span><b style="color:var(--cream);font-weight:600;font-size:11.5px">${m.v}</b>`).join('')}</td>
+      <td>${t.tks.map(k=>`<span class="tk2 ${k.c||''}">${k.t}</span>`).join(' ')}</td></tr>`).join('');
     h+=sec('theme',day.themes.title||'热点逻辑链 · 主线衍生','Theme Map',
-      `<div class="banner">主线：${day.flowMain}</div><div class="thms">${day.themes.items.map(t=>`<div class="thm ${t.avoid?'avoid':''}"><div class="bh">${t.ic} ${t.nm}</div><div class="desc">${t.desc}</div>${t.mts.map(m=>`<div class="mt">${m.k}：<b>${m.v}</b></div>`).join('')}<div class="tks">${t.tks.map(k=>`<span class="tk2 ${k.c||''}">${k.t}</span>`).join('')}</div></div>`).join('')}</div>`);
+      `<div class="banner">主线：${day.flowMain}</div>`+dtable(['方向','判断 / 催化','关联标的'],themeRows));
   }
-  if(day.plan&&day.plan.length){h+=sec('plan',day.planTitle||(day.trades?'操盘计划 · 修正':'操盘计划 · 推荐票'),'Positions',
-    `<div class="plan">${day.plan.map(p=>`<div class="pk ${p.type||''}"><div class="nm">${p.nm}</div><div class="ps">${p.ps}</div><div class="nt">${p.nt}</div></div>`).join('')}</div>`);}
+  if(day.plan&&day.plan.length){
+    const planRows=day.plan.map(p=>{
+      const col=p.type==='sell'?'var(--down)':p.type==='buy'?'var(--up)':'var(--orange)';
+      return `<tr><td class="sctnm">${p.nm}</td><td class="num" style="color:${col};font-family:var(--serif);font-size:15px">${p.ps}</td><td style="color:var(--t2)">${p.nt}</td></tr>`;}).join('');
+    h+=sec('plan',day.planTitle||(day.trades?'操盘计划 · 修正':'操盘计划 · 推荐票'),'Positions',
+      dtable(['标的','动作 / 仓位','说明'],planRows));
+  }
   if(day.rules){h+=sec('rule','交易铁律 · 从错题提炼','Rules',`<div class="pull">${day.rules.map(r=>`<div class="i">${r}</div>`).join('')}</div>`);}
   h+=sec('read','我的解读 · 风格符合度','Analysis',`<div class="essay">${day.read.map((r,i)=>`<div class="item"><div class="n">${String(i+1).padStart(2,'0')}</div><div class="tx">${r}</div></div>`).join('')}</div>`);
   if(day.todo){h+=`<details class="foot" id="todo"><summary>待核对（准确铁律）· ${day.todo.length} 项 · 点开查看</summary><div class="todo">${day.todo.map(t=>`<div class="i">${t}</div>`).join('')}</div></details>`;}
